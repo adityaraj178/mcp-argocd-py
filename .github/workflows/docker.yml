@@ -9,9 +9,9 @@ on:
 
 env:
   GHCR_REGISTRY: ghcr.io
-  QUAY_REGISTRY: quay.io
+  # Resolves to ghcr.io/adityaraj178/mcp-argocd-py. The upstream project also
+  # publishes to quay.io/argoprojlabs; that needs its secrets, so it is not done here.
   IMAGE_NAME: ${{ github.repository }}
-  QUAY_IMAGE_NAME: argoprojlabs/mcp-for-argocd
 
 jobs:
   build-and-push-image:
@@ -45,20 +45,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Log in to Quay.io
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        with:
-          registry: ${{ env.QUAY_REGISTRY }}
-          username: ${{ secrets.QUAY_USERNAME }}
-          password: ${{ secrets.QUAY_TOKEN }}
-
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: |
             ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE_NAME }}
-            ${{ env.QUAY_REGISTRY }}/${{ env.QUAY_IMAGE_NAME }}
           tags: |
             type=raw,value=latest,enable=${{ github.event_name == 'push' }}
             type=ref,event=tag

@@ -58,4 +58,4 @@ dev: .venv ## Run the server over HTTP, restarting when the source changes
 
 .PHONY: docker
 docker: ## Build the container image
-	docker build -t argocd-mcp .
+	docker build -t mcp-argocd-py .

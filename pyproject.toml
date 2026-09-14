@@ -1,11 +1,13 @@
 [project]
-name = "argocd-mcp"
+name = "mcp-argocd-py"
 version = "0.9.0"
-description = "Argo CD MCP Server"
+description = "Argo CD MCP Server (Python port of argoproj-labs/mcp-for-argocd)"
 readme = "README.md"
 license = "Apache-2.0"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "NOTICE"]
+# The server design and behaviour come from the upstream TypeScript project.
 authors = [{ name = "Argo Proj Contributors." }]
+maintainers = [{ name = "Aditya Raj" }]
 requires-python = ">=3.10"
 keywords = [
   "mcp",
@@ -44,8 +46,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/argoproj-labs/mcp-for-argocd"
-Repository = "https://github.com/argoproj-labs/mcp-for-argocd.git"
+Homepage = "https://github.com/adityaraj178/mcp-argocd-py"
+Repository = "https://github.com/adityaraj178/mcp-argocd-py.git"
+Issues = "https://github.com/adityaraj178/mcp-argocd-py/issues"
+Upstream = "https://github.com/argoproj-labs/mcp-for-argocd"
 
 [project.scripts]
 argocd-mcp = "argocd_mcp.cmd:main"

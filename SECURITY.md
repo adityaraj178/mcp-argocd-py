@@ -4,17 +4,19 @@
 
 Please **do not** open a public GitHub issue for a suspected vulnerability.
 
-To report one, create a draft GitHub security advisory:
+To report one, create a draft GitHub security advisory on this repository:
 
-https://github.com/argoproj-labs/mcp-for-argocd/security/advisories/new
+https://github.com/adityaraj178/mcp-argocd-py/security/advisories/new
 
-This is the same process the [Argo CD project](https://github.com/argoproj/argo-cd/blob/master/SECURITY.md) uses. The advisory is private until we publish it, and it is where a CVE is requested and the fix is coordinated. Reports sent to individual maintainers or to any vendor's support channel will be redirected here, which only delays the fix.
+The advisory is private until it is published, and it is where the fix is coordinated. This is the same process the [Argo CD project](https://github.com/argoproj/argo-cd/blob/master/SECURITY.md) and the upstream [`mcp-for-argocd`](https://github.com/argoproj-labs/mcp-for-argocd/blob/main/SECURITY.md) server use.
+
+This project is a Python port of [`argoproj-labs/mcp-for-argocd`](https://github.com/argoproj-labs/mcp-for-argocd) and shares its design. If the issue is in that shared design (the credential model, the listener protections, a tool's behaviour) rather than in this port's Python implementation, please also report it to the upstream project through [its advisory process](https://github.com/argoproj-labs/mcp-for-argocd/security/advisories/new), so both implementations get fixed.
 
 Please include enough detail to reproduce the issue: the affected version, the configuration or transport involved (`stdio`, `http`, `sse`), and the steps or proof of concept.
 
-We will do our best to respond quickly, though a reply may occasionally take longer (for example, out-of-office periods). We are happy to coordinate a disclosure timeline with you and to credit you in the advisory.
+This is a personal project, so a reply may take a little while. We are happy to coordinate a disclosure timeline with you and to credit you in the advisory.
 
-**Findings from automated scanners** are already public, so report those as a normal [GitHub issue](https://github.com/argoproj-labs/mcp-for-argocd/issues) — the discussion is usually of general benefit.
+**Findings from automated scanners** are already public, so report those as a normal [GitHub issue](https://github.com/adityaraj178/mcp-argocd-py/issues) — the discussion is usually of general benefit.
 
 ## Supported Versions
 

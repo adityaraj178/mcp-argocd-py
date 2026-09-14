@@ -3,7 +3,9 @@
     "argocd-mcp": {
       "command": "uvx",
       "args": [
-        "argocd-mcp@latest",
+        "--from",
+        "git+https://github.com/adityaraj178/mcp-argocd-py",
+        "argocd-mcp",
         "stdio"
       ],
       "env": {

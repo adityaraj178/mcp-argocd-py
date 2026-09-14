@@ -9,7 +9,7 @@ from collections.abc import Callable, Sequence
 
 from dotenv import load_dotenv
 
-from argocd_mcp import __version__
+from argocd_mcp import SERVER_NAME, __version__
 from argocd_mcp.log import logger
 from argocd_mcp.server.security import DEFAULT_BIND_ADDRESS
 
@@ -82,7 +82,7 @@ def build_parser() -> argparse.ArgumentParser:
     # is silently taken as a prefix of '--allowed-host-header' and the listener
     # starts with a different protection than the operator asked for.
     parser = argparse.ArgumentParser(
-        prog="argocd-mcp", description="Argo CD MCP Server", allow_abbrev=False
+        prog=SERVER_NAME, description="Argo CD MCP Server", allow_abbrev=False
     )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     commands = parser.add_subparsers(dest="command", required=True, metavar="{stdio,sse,http}")

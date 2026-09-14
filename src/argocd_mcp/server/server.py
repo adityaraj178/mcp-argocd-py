@@ -15,7 +15,7 @@ from mcp.server.models import InitializationOptions
 from mcp.shared.exceptions import MCPError
 from pydantic import Field, ValidationError
 
-from argocd_mcp import PACKAGE_NAME, __version__
+from argocd_mcp import SERVER_NAME, __version__
 from argocd_mcp.argocd.client import ArgoCDClient
 from argocd_mcp.argocd.types import ResourceRef
 from argocd_mcp.models import (
@@ -228,7 +228,7 @@ class Server:
         self._tools: dict[str, ToolSpec] = {}
 
         self.mcp: LowLevelServer[Any] = LowLevelServer(
-            PACKAGE_NAME,
+            SERVER_NAME,
             version=__version__,
             on_list_tools=self._on_list_tools,
             on_call_tool=self._on_call_tool,

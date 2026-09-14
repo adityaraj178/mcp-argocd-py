@@ -1,8 +1,23 @@
-# Argo CD MCP Server
+# Argo CD MCP Server (Python)
 
 An implementation of [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for [Argo CD](https://argo-cd.readthedocs.io/en/stable/), enabling AI assistants to interact with your Argo CD applications through natural language. This server allows for seamless integration with Visual Studio Code and other MCP clients through stdio and HTTP stream transport protocols.
 
-This is the Python implementation of the [`mcp-for-argocd`](https://github.com/argoproj-labs/mcp-for-argocd) server. It exposes the same tools, transports, environment variables, and security model as the TypeScript original, so the client configuration only differs in how the process is launched.
+## About this repository
+
+**This is a Python port of [`argoproj-labs/mcp-for-argocd`](https://github.com/argoproj-labs/mcp-for-argocd), the official Argo CD MCP Server written in TypeScript.** It was ported from upstream release [v0.9.0](https://github.com/argoproj-labs/mcp-for-argocd/releases/tag/v0.9.0) and is intended to behave identically:
+
+| | Upstream (TypeScript) | This repository (Python) |
+|---|---|---|
+| Tools, argument schemas, and results | 16 tools | the same 16 tools, same names and arguments |
+| Transports | `stdio`, `sse`, `http` (`--stateless`) | the same |
+| Environment variables and CLI flags | `ARGOCD_BASE_URL`, `ARGOCD_API_TOKEN`, `ARGOCD_TOKEN_REGISTRY_PATH`, `MCP_AUTH_TOKEN`, `MCP_BIND_ADDRESS`, `MCP_READ_ONLY`, `--port`, `--bind-address`, `--allowed-host-header`, `--allowed-origin`, `--allow-unauthenticated`, `--stateless` | the same |
+| Credential and listener security model | see below | the same rules, same error messages, same test suite (ported) |
+| Server identity (`serverInfo.name`) | `argocd-mcp` | `argocd-mcp` |
+| How it is launched | `npx argocd-mcp@latest stdio` | `uvx --from git+https://github.com/adityaraj178/mcp-argocd-py argocd-mcp stdio` |
+| Self-signed certificates | `NODE_TLS_REJECT_UNAUTHORIZED=0` | `SSL_CERT_FILE` or `ARGOCD_INSECURE_SKIP_VERIFY=true` |
+| Runtime | Node.js, `@modelcontextprotocol/sdk` | Python 3.10+, the official `mcp` Python SDK |
+
+The documentation below is adapted from the upstream README so that the two projects stay easy to compare. Credit for the design, the tool surface, the security model, and the original documentation and tests goes to the [Argo Proj Contributors](https://github.com/argoproj-labs/mcp-for-argocd/graphs/contributors); see [NOTICE](NOTICE). Both projects are licensed under the [Apache License 2.0](LICENSE). This port is a personal project and is not affiliated with or endorsed by the Argo Project or argoproj-labs. If you want the official, supported server, use [`argoproj-labs/mcp-for-argocd`](https://github.com/argoproj-labs/mcp-for-argocd).
 
 ## Features
 
@@ -43,22 +58,25 @@ The server provides the following ArgoCD management tools:
 ### Prerequisites
 
 - Python 3.10 or higher
-- [`uv`](https://docs.astral.sh/uv/) (recommended; `uvx` runs the server with no install step) or `pip`
+- [`uv`](https://docs.astral.sh/uv/) (recommended; `uvx` runs the server straight from this repository with no install step) or `pip`
 - Argo CD instance with API access
 - Argo CD API token (see the [docs for instructions](https://argo-cd.readthedocs.io/en/stable/developer-guide/api-docs/#authorization))
 
-Install from PyPI:
+The package is not published to PyPI; install it from this repository:
 
 ```bash
-uv tool install argocd-mcp     # or: pip install argocd-mcp
+uv tool install git+https://github.com/adityaraj178/mcp-argocd-py
+# or: pip install git+https://github.com/adityaraj178/mcp-argocd-py
 argocd-mcp --help
 ```
 
-Or run it directly without installing, which is what the client configurations below do:
+Or run it directly without installing, which is what the client configurations below do (`--from` names the package, `argocd-mcp` is the command it provides):
 
 ```bash
-uvx argocd-mcp stdio
+uvx --from git+https://github.com/adityaraj178/mcp-argocd-py argocd-mcp stdio
 ```
+
+Pin a release by appending `@<tag>` to the Git URL, e.g. `git+https://github.com/adityaraj178/mcp-argocd-py@v0.9.0`.
 
 ### Usage with Cursor
 1. Follow the [Cursor documentation for MCP support](https://docs.cursor.com/context/model-context-protocol), and create a `.cursor/mcp.json` file in your project:
@@ -68,7 +86,9 @@ uvx argocd-mcp stdio
     "argocd-mcp": {
       "command": "uvx",
       "args": [
-        "argocd-mcp@latest",
+        "--from",
+        "git+https://github.com/adityaraj178/mcp-argocd-py",
+        "argocd-mcp",
         "stdio"
       ],
       "env": {
@@ -92,7 +112,9 @@ uvx argocd-mcp stdio
       "type": "stdio",
       "command": "uvx",
       "args": [
-        "argocd-mcp@latest",
+        "--from",
+        "git+https://github.com/adityaraj178/mcp-argocd-py",
+        "argocd-mcp",
         "stdio"
       ],
       "env": {
@@ -115,7 +137,9 @@ uvx argocd-mcp stdio
     "argocd-mcp": {
       "command": "uvx",
       "args": [
-        "argocd-mcp@latest",
+        "--from",
+        "git+https://github.com/adityaraj178/mcp-argocd-py",
+        "argocd-mcp",
         "stdio"
       ],
       "env": {
@@ -276,11 +300,11 @@ export MCP_AUTH_TOKEN=<inbound_token>
 argocd-mcp http --bind-address 0.0.0.0 --allowed-host-header mcp.internal.example.com
 ```
 
-The container image keeps the same loopback default, so it needs no extra configuration when the caller shares its network namespace, such as a sidecar in the same Kubernetes pod:
+The container image (`ghcr.io/adityaraj178/mcp-argocd-py`, built by [this repository's workflow](.github/workflows/docker.yml)) keeps the same loopback default, so it needs no extra configuration when the caller shares its network namespace, such as a sidecar in the same Kubernetes pod:
 
 ```bash
 docker run -e ARGOCD_BASE_URL=<argocd_url> -e ARGOCD_API_TOKEN=<argocd_token> \
-  argoprojlabs/mcp-for-argocd
+  ghcr.io/adityaraj178/mcp-argocd-py
 ```
 
 To publish a port, widen the bind and set an inbound credential:
@@ -289,7 +313,7 @@ To publish a port, widen the bind and set an inbound credential:
 docker run -p 3000:3000 \
   -e ARGOCD_BASE_URL=<argocd_url> -e ARGOCD_API_TOKEN=<argocd_token> \
   -e MCP_BIND_ADDRESS=0.0.0.0 -e MCP_AUTH_TOKEN=<inbound_token> \
-  argoprojlabs/mcp-for-argocd
+  ghcr.io/adityaraj178/mcp-argocd-py
 ```
 
 When the bind is widened and a proxy or mesh already authenticates callers, use `--allow-unauthenticated` instead of `MCP_AUTH_TOKEN`.
@@ -327,7 +351,7 @@ Or with Docker:
 docker run -p 3000:3000 \
   -e ARGOCD_BASE_URL=<argocd_url> -e ARGOCD_API_TOKEN=<argocd_token> \
   -e MCP_BIND_ADDRESS=0.0.0.0 -e MCP_AUTH_TOKEN=<inbound_token> \
-  argoprojlabs/mcp-for-argocd http --stateless
+  ghcr.io/adityaraj178/mcp-argocd-py http --stateless
 ```
 
 The image has an `ENTRYPOINT`, so overriding the command replaces only the arguments. Publishing a port is what makes the wider bind and the inbound token necessary here; see [Network Exposure](#network-exposure).
@@ -347,8 +371,8 @@ Logs are written to **stderr** as JSON lines (stdout is reserved for the stdio t
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/argoproj-labs/mcp-for-argocd.git
-cd mcp-for-argocd
+git clone https://github.com/adityaraj178/mcp-argocd-py.git
+cd mcp-argocd-py
 ```
 
 2. Install project dependencies (creates `.venv`):
