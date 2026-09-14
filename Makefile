@@ -56,6 +56,22 @@ dev: .venv ## Run the server over HTTP, restarting when the source changes
 	$(UV) run --with watchfiles watchfiles --filter python \
 		"$(PYTHON) -m argocd_mcp http --port $(PORT)" src
 
+# MCP Inspector (https://github.com/modelcontextprotocol/inspector) needs Node 22+.
+# Extra inspector flags go in INSPECTOR_ARGS, e.g. `-e KEY=VALUE` or `--header`.
+INSPECTOR ?= npx -y @modelcontextprotocol/inspector@latest
+INSPECTOR_ARGS ?=
+
+# The inspector starts the stdio server with a minimal environment, so ARGOCD_*
+# variables exported in the shell do not reach it: put them in .env (loaded by
+# the server) or pass them with INSPECTOR_ARGS="-e ARGOCD_BASE_URL=... ".
+.PHONY: inspector
+inspector: .venv ## Open the MCP Inspector on the server over stdio (needs Node 22+)
+	$(INSPECTOR) $(INSPECTOR_ARGS) -- $(CURDIR)/.venv/bin/argocd-mcp stdio
+
+.PHONY: inspector-http
+inspector-http: ## Open the MCP Inspector on a running HTTP server (make run / make dev)
+	$(INSPECTOR) $(INSPECTOR_ARGS) --server-url http://127.0.0.1:$(PORT)/mcp --transport http
+
 .PHONY: docker
 docker: ## Build the container image
 	docker build -t mcp-argocd-py .

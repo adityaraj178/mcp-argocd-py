@@ -434,6 +434,29 @@ A `.env` file in the working directory is loaded at startup (values already pres
 
 See [Token resolution](#token-registry--per-base-url-tokens-multi-instance) for how the default token and registry interact. If `ARGOCD_TOKEN_REGISTRY_PATH` is set but the file is missing, unreadable, or malformed, the server fails closed at startup.
 
+### MCP Inspector
+
+The [MCP Inspector](https://github.com/modelcontextprotocol/inspector) is a browser UI for calling a server's tools by hand and watching the protocol messages. It runs through `npx` and needs Node.js 22.19 or newer.
+
+```bash
+make inspector        # start the server over stdio inside the inspector
+make inspector-http   # attach to a server already running via `make run` / `make dev`
+```
+
+`make inspector` opens the UI in your browser (the URL, including its one-time auth token, is printed in the terminal) with the server pre-loaded; flip the switch on the server card to connect, then use the **Tools** tab. The inspector starts the stdio server with a minimal environment, so `ARGOCD_*` variables exported in your shell do not reach it. Either put them in a `.env` file in the repository root (the server loads it at startup) or pass them explicitly:
+
+```bash
+make inspector INSPECTOR_ARGS="-e ARGOCD_BASE_URL=https://argo.example.com -e ARGOCD_API_TOKEN=<token>"
+```
+
+`make inspector-http` connects to `http://127.0.0.1:$(PORT)/mcp`. The credentials are whatever the running server was started with; to send them per connection instead, use headers (`INSPECTOR_ARGS='--header "x-argocd-base-url: https://argo.example.com" --header "x-argocd-api-token: <token>"'`), and add `--header "Authorization: Bearer <token>"` if the server was started with `MCP_AUTH_TOKEN`. Anything passed on the command line is visible in the process list, so prefer `.env` for the API token.
+
+To script against the server instead of clicking, add `--cli`:
+
+```bash
+npx -y @modelcontextprotocol/inspector@latest --cli .venv/bin/argocd-mcp stdio -- --method tools/list
+```
+
 ### Project layout
 
 ```
