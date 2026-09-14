@@ -1,0 +1,84 @@
+[project]
+name = "argocd-mcp"
+version = "0.9.0"
+description = "Argo CD MCP Server"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Argo Proj Contributors." }]
+requires-python = ">=3.10"
+keywords = [
+  "mcp",
+  "argocd",
+  "argocd-mcp",
+  "argocd-mcp-server",
+  "argo-cd",
+  "argo-cd-mcp",
+  "argo-cd-mcp-server",
+  "cicd",
+  "cicd-mcp",
+  "cicd-mcp-server",
+  "gitops",
+  "gitops-mcp",
+  "gitops-mcp-server",
+  "kubernetes",
+  "kubernetes-mcp",
+  "kubernetes-mcp-server",
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "mcp>=2.2.0,<3",
+  "httpx>=0.27.0",
+  "pydantic>=2.7.0",
+  "starlette>=0.37.0",
+  "uvicorn>=0.30.0",
+  "anyio>=4.4.0",
+  "python-dotenv>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/argoproj-labs/mcp-for-argocd"
+Repository = "https://github.com/argoproj-labs/mcp-for-argocd.git"
+
+[project.scripts]
+argocd-mcp = "argocd_mcp.cmd:main"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.2.0",
+  "pytest-asyncio>=0.23.0",
+  "ruff>=0.5.0",
+  "mypy>=1.10.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/argocd_mcp"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src"]

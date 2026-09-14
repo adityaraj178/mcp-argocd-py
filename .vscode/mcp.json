@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "argocd-mcp-http": {
+      "type": "http",
+      "url": "http://localhost:3000/mcp",
+      "headers": {
+        "x-argocd-base-url": "<argocd_url>",
+        "x-argocd-api-token": "<argocd_token>"
+      }
+    }
+  }
+}

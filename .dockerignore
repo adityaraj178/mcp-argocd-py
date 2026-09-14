@@ -1,0 +1,17 @@
+.git
+.github
+.venv
+.vscode
+.cursor
+.pytest_cache
+.mypy_cache
+.ruff_cache
+__pycache__
+*.pyc
+tests
+dist
+build
+*.egg-info
+.env
+.env.*
+token-registry.json
